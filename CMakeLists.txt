@@ -4,6 +4,7 @@ project(sotuken CXX)
 
 include_directories(/usr/local/include/opencv4)
 link_directories(/usr/local/lib)
+add_compile_options(-g -ggdb)
 
 add_executable(main.o main.cpp)
 set_property(TARGET main.o PROPERTY CXX_STANDARD 11)
