@@ -4,29 +4,29 @@
 
 using namespace cv;
 using namespace std;
+using namespace traits;
 
 int main(){
     std::string image_path = "many_circle_bin.png";
     Mat src = imread(image_path, IMREAD_COLOR);
-    Mat gray;
+    Mat gray, labelImg, stats, centroids, Dst;
+    src.copyTo(Dst);
     cvtColor(src, gray, COLOR_BGR2GRAY);
     medianBlur(gray, gray, 5);
 
     vector<Vec3f> circles;
-    HoughCircles(gray, circles, HOUGH_GRADIENT, 1, 50, 100, 10, 5, 30);
+    int n = connectedComponentsWithStats(gray, labelImg, stats, centroids);
+    
+    /* 重心 */
+    for (size_t i = 1; i < n; i++){
+        double *param = centroids.ptr<double>(i);
+        int x = static_cast<int>(param[0]);
+        int y = static_cast<int>(param[1]);
 
-    for( size_t i = 0; i < circles.size(); i++ )
-    {
-        Vec3i c = circles[i];
-        Point center = Point(c[0], c[1]);
-        // circle center
-        circle( src, center, 1, Scalar(0,100,100), 3, LINE_AA);
-        // circle outline
-        int radius = c[2];
-        circle( src, center, radius, Scalar(255,0,255), 3, LINE_AA);
+        circle(Dst, Point(x, y), 3, Scalar(0, 0, 255), -1);
     }
 
-    imshow("Display window", src);
+    imshow("Display window", Dst);
     int k = waitKey(0);
     return 0;
 }
