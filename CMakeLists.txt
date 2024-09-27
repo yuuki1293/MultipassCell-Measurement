@@ -7,5 +7,5 @@ link_directories(/usr/local/lib)
 add_compile_options(-g -ggdb)
 
 add_executable(main.o main.cpp)
-set_property(TARGET main.o PROPERTY CXX_STANDARD 11)
+set_property(TARGET main.o PROPERTY CXX_STANDARD 23)
 target_link_libraries(main.o opencv_core opencv_imgcodecs opencv_highgui opencv_imgproc)
