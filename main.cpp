@@ -67,6 +67,7 @@ Mat remove_area(const Mat image, int min, int max){
     return result;
 }
 
+// 端を黒塗りする
 Mat crop(const Mat image, int left, int top, int right, int bottom){
     Mat result;
     image.copyTo(result);
