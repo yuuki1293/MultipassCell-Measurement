@@ -40,7 +40,7 @@ int main(){
         int y = param[ConnectedComponentsTypes::CC_STAT_TOP];
         stringstream num;
         num << i;
-        putText(Dst, num.str(), cv::Point(x + 5, y + 20), FONT_HERSHEY_COMPLEX, 0.7, Scalar(255, 0, 0), 2);
+        putText(Dst, num.str(), cv::Point(x + 5, y + 10), FONT_HERSHEY_COMPLEX, 0.7, Scalar(255, 0, 0), 2);
     }
 
     imshow("Display window", Dst);
