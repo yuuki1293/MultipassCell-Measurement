@@ -34,7 +34,7 @@ int main(){
     // 面積値の出力
     for (size_t i = 1; i < n; i++) {
         int *param = stats.ptr<int>(i);
-        std::print("area {} = {}\n", i, param[ConnectedComponentsTypes::CC_STAT_AREA]);
+        std::print("area {} = {} ({}, {})\n", i, param[ConnectedComponentsTypes::CC_STAT_AREA], param[ConnectedComponentsTypes::CC_STAT_LEFT], param[ConnectedComponentsTypes::CC_STAT_TOP]);
 
         int x = param[ConnectedComponentsTypes::CC_STAT_LEFT];
         int y = param[ConnectedComponentsTypes::CC_STAT_TOP];
