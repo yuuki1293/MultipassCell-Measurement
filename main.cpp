@@ -22,7 +22,7 @@ int main()
     cvtColor(src, gray, COLOR_BGR2GRAY);
     medianBlur(gray, gray, 5);
 
-    gray = remove_area(gray, 100, 2000);   // 200~200ピクセル以外の図形を削除
+    gray = remove_area(gray, 100, 2000);   // 100~200ピクセル以外の図形を削除
     gray = crop(gray, 400, 400, 400, 400); // 縁から400ピクセルを削除
     int n = connectedComponentsWithStats(gray, labelImg, stats, centroids);
 
