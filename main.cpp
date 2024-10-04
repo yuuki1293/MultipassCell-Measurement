@@ -22,7 +22,7 @@ int main()
     cvtColor(src, gray, COLOR_BGR2GRAY);
     medianBlur(gray, gray, 5);
 
-    gray = remove_area(gray, 200, 2000);   // 200~200ピクセル以外の図形を削除
+    gray = remove_area(gray, 100, 2000);   // 200~200ピクセル以外の図形を削除
     gray = crop(gray, 400, 400, 400, 400); // 縁から400ピクセルを削除
     int n = connectedComponentsWithStats(gray, labelImg, stats, centroids);
 
@@ -49,7 +49,7 @@ int main()
 
         stringstream num;
         num << i;
-        putText(Dst, num.str(), cv::Point(x + 5, y + 10), FONT_HERSHEY_COMPLEX, 0.7, Scalar(255, 0, 0), 2);
+        putText(Dst, num.str(), cv::Point(x, y), FONT_HERSHEY_COMPLEX, 0.7, Scalar(255, 0, 0), 2);
     }
 
     // // 中心を（0, 0）にする
@@ -121,7 +121,7 @@ Mat crop(const Mat image, int left, int top, int right, int bottom)
 string toSVG(const Point *centers, int n)
 {
     string s = "<?xml version=\"1.0\"?>";
-    s += "<svg width=\"88.9mm\" height=\"88.9mm\" xmlns=\"http://www.w3.org/2000/svg\">";
+    s += "<svg width=\"210mm\" height=\"297mm\" xmlns=\"http://www.w3.org/2000/svg\">";
 
     for (size_t i = 1; i < n; i++)
     {
