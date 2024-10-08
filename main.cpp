@@ -49,7 +49,7 @@ int main()
 
         stringstream num;
         num << i;
-        putText(Dst, num.str(), cv::Point(x, y), FONT_HERSHEY_COMPLEX, 0.7, Scalar(255, 0, 0), 2);
+        putText(Dst, num.str(), cv::Point(x, y), FONT_HERSHEY_COMPLEX, 1.0, Scalar(0, 255, 0), 2);
     }
 
     // // 中心を（0, 0）にする
@@ -78,6 +78,7 @@ int main()
         print("{} = ({}, {})\n", i, centers[i].x, centers[i].y);
     }
 
+    imwrite("label.png", Dst);
     imshow("Display window", Dst);
     int k = waitKey(0);
     return 0;
