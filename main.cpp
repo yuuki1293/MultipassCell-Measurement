@@ -19,8 +19,11 @@ int main()
     Mat src = imread(image_path, IMREAD_COLOR);
     Mat gray, labelImg, stats, centroids, Dst;
     bitwise_not(src, Dst);
-    cvtColor(src, gray, COLOR_BGR2GRAY);
-    medianBlur(gray, gray, 5);
+    
+    vector<Mat> bgr_channels;
+    split(src, bgr_channels);
+    Mat green_channel = bgr_channels[1];
+    inRange(green_channel, Scalar(180), Scalar(255), gray); // 2値化
 
     gray = remove_area(gray, 100, 2000);   // 100~200ピクセル以外の図形を削除
     gray = crop(gray, 400, 400, 400, 400); // 縁から400ピクセルを削除
