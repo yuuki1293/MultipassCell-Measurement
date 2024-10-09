@@ -38,7 +38,7 @@ int main()
         int y = param[1];
 
         centers[i] = Point(x, y);
-        circle(Dst, Point(x, y), 3, Scalar(0, 255, 0), -1);
+        circle(Dst, Point(x, y), 10, Scalar(255, 0, 0), -1);
     }
 
     // 面積値の出力
@@ -52,7 +52,7 @@ int main()
 
         stringstream num;
         num << i;
-        putText(Dst, num.str(), cv::Point(x, y), FONT_HERSHEY_COMPLEX, 1.0, Scalar(0, 0, 255), 2);
+        putText(Dst, num.str(), cv::Point(x, y), FONT_HERSHEY_COMPLEX, 1.5, Scalar(0, 0, 255), 2);
     }
 
     // 単位をピクセルからμｍに変換
