@@ -15,19 +15,35 @@ string toSVG(const Point *centers, int n);
 
 int main()
 {
-    std::string image_path = "many_circle_bin.png";
+    std::string image_path = "sample.JPG";
     Mat src = imread(image_path, IMREAD_COLOR);
-    Mat gray, labelImg, stats, centroids, Dst;
-    bitwise_not(src, Dst);
+    Mat square, gray, labelImg, stats, centroids, Dst;
     
+    vector<Point2f> src_pts;
+    src_pts.push_back(Point2f(1468, 528)); // ↖
+    src_pts.push_back(Point2f(3322, 577)); // ↗
+    src_pts.push_back(Point2f(1474, 2634)); // ↙
+    src_pts.push_back(Point2f(3316, 2516)); // ↘
+
+    vector<Point2f> dst_pts;
+    dst_pts.push_back(Point2f(0, 0)); // ↖
+    dst_pts.push_back(Point2f(2000, 0)); // ↗
+    dst_pts.push_back(Point2f(0, 2000)); // ↙
+    dst_pts.push_back(Point2f(2000, 2000)); // ↘
+
+    Mat M = getPerspectiveTransform(src_pts, dst_pts);
+    warpPerspective(src, square, M, Size(2000, 2000));
+
     vector<Mat> bgr_channels;
-    split(src, bgr_channels);
+    split(square, bgr_channels);
     Mat green_channel = bgr_channels[1];
     inRange(green_channel, Scalar(180), Scalar(255), gray); // 2値化
 
-    gray = remove_area(gray, 100, 2000);   // 100~200ピクセル以外の図形を削除
+    gray = remove_area(gray, 100, 3000);   // 100~200ピクセル以外の図形を削除
     gray = crop(gray, 400, 400, 400, 400); // 縁から400ピクセルを削除
     int n = connectedComponentsWithStats(gray, labelImg, stats, centroids);
+
+    bitwise_not(gray, Dst); // ラベリング用画像
 
     Point centers[n];
     // 重心
