@@ -4,7 +4,7 @@
 #include <opencv2/opencv.hpp>
 
 #define REAL_LEN 88900 // μm
-#define THRESHOLD 180
+#define THRESHOLD 180 // しきい値
 
 using namespace cv;
 using namespace std;
@@ -99,6 +99,7 @@ Mat projectiveT(Mat src){
     return result;
 }
 
+// 2値化
 Mat binaryT(Mat src){
     vector<Mat> bgr_channels;
     split(src, bgr_channels);
@@ -108,6 +109,7 @@ Mat binaryT(Mat src){
     
     return result;
 }
+
 // 特定の大きさのオブジェクト以外を削除
 Mat remove_area(const Mat image, int min, int max)
 {
@@ -143,6 +145,7 @@ Mat crop(const Mat image, int left, int top, int right, int bottom)
     return result;
 }
 
+// SVG形式に変換
 string toSVG(const Point *centers, int n)
 {
     string s = "<?xml version=\"1.0\"?>";
