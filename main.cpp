@@ -4,11 +4,13 @@
 #include <opencv2/opencv.hpp>
 
 #define REAL_LEN 88900 // μm
+#define THRESHOLD 180
 
 using namespace cv;
 using namespace std;
 using namespace traits;
 
+Mat projectiveT(Mat src);
 Mat remove_area(const Mat image, int min, int max);
 Mat crop(const Mat image, int left, int top, int right, int bottom);
 string toSVG(const Point *centers, int n);
@@ -17,34 +19,15 @@ int main()
 {
     std::string image_path = "sample.JPG";
     Mat src = imread(image_path, IMREAD_COLOR);
-    Mat square, gray, labelImg, stats, centroids, Dst;
-    
-    vector<Point2f> src_pts;
-    src_pts.push_back(Point2f(1468, 528)); // ↖
-    src_pts.push_back(Point2f(3322, 577)); // ↗
-    src_pts.push_back(Point2f(1474, 2634)); // ↙
-    src_pts.push_back(Point2f(3316, 2516)); // ↘
+    Mat process, labelImg, stats, centroids, labeling;
 
-    vector<Point2f> dst_pts;
-    dst_pts.push_back(Point2f(0, 0)); // ↖
-    dst_pts.push_back(Point2f(2000, 0)); // ↗
-    dst_pts.push_back(Point2f(0, 2000)); // ↙
-    dst_pts.push_back(Point2f(2000, 2000)); // ↘
+    process = projectiveT(src);
+    Mat bin = process = binaryT(process);
+    process = crop(process, 400, 400, 400, 400); // 縁から400pxを削除
+    process = remove_area(process, 100, 3000); // 100~200ピクセル以外の図形を削除
 
-    Mat M = getPerspectiveTransform(src_pts, dst_pts);
-    warpPerspective(src, square, M, Size(2000, 2000));
-
-    vector<Mat> bgr_channels;
-    split(square, bgr_channels);
-    Mat green_channel = bgr_channels[1];
-    inRange(green_channel, Scalar(180), Scalar(255), gray); // 2値化
-
-    gray = remove_area(gray, 100, 3000);   // 100~200ピクセル以外の図形を削除
-    gray = crop(gray, 400, 400, 400, 400); // 縁から400ピクセルを削除
-    int n = connectedComponentsWithStats(gray, labelImg, stats, centroids);
-
-    bitwise_not(gray, Dst); // ラベリング用画像
-
+    bitwise_not(bin, labeling); // ラベリング用画像
+    int n = connectedComponentsWithStats(process, labelImg, stats, centroids);
     Point centers[n];
     // 重心
     for (size_t i = 1; i < n; i++)
@@ -54,7 +37,7 @@ int main()
         int y = param[1];
 
         centers[i] = Point(x, y);
-        circle(Dst, Point(x, y), 10, Scalar(255, 0, 0), -1);
+        circle(labeling, Point(x, y), 10, Scalar(255, 0, 0), -1);
     }
 
     // 面積値の出力
@@ -68,13 +51,13 @@ int main()
 
         stringstream num;
         num << i;
-        putText(Dst, num.str(), cv::Point(x, y), FONT_HERSHEY_COMPLEX, 1.5, Scalar(0, 0, 255), 2);
+        putText(labeling, num.str(), cv::Point(x, y), FONT_HERSHEY_COMPLEX, 1.5, Scalar(0, 0, 255), 2);
     }
 
     // 単位をピクセルからμｍに変換
     for (size_t i = 1; i < n; i++)
     {
-        int um_per_pix = REAL_LEN / src.cols;
+        int um_per_pix = REAL_LEN / process.cols;
 
         centers[i] = centers[i] * um_per_pix;
     }
@@ -89,12 +72,42 @@ int main()
         print("{} = ({}, {})\n", i, centers[i].x, centers[i].y);
     }
 
-    imwrite("label.png", Dst);
-    imshow("Display window", Dst);
+    imwrite("label.png", labeling);
+    imshow("Display window", labeling);
     int k = waitKey(0);
     return 0;
 }
 
+// 射影変換
+Mat projectiveT(Mat src){
+    vector<Point2f> src_pts;
+    src_pts.push_back(Point2f(1468, 528)); // ↖
+    src_pts.push_back(Point2f(3322, 577)); // ↗
+    src_pts.push_back(Point2f(1474, 2634)); // ↙
+    src_pts.push_back(Point2f(3316, 2516)); // ↘
+
+    vector<Point2f> dst_pts;
+    dst_pts.push_back(Point2f(0, 0)); // ↖
+    dst_pts.push_back(Point2f(2000, 0)); // ↗
+    dst_pts.push_back(Point2f(0, 2000)); // ↙
+    dst_pts.push_back(Point2f(2000, 2000)); // ↘
+
+    Mat M = getPerspectiveTransform(src_pts, dst_pts);
+    Mat result;
+    warpPerspective(src, result, M, Size(2000, 2000));
+
+    return result;
+}
+
+Mat binaryT(Mat src){
+    vector<Mat> bgr_channels;
+    split(src, bgr_channels);
+    Mat green_channel = bgr_channels[1];
+    Mat result;
+    inRange(green_channel, Scalar(THRESHOLD), Scalar(255), result); // 2値化
+    
+    return result;
+}
 // 特定の大きさのオブジェクト以外を削除
 Mat remove_area(const Mat image, int min, int max)
 {

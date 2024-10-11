@@ -56,5 +56,9 @@
   "C_Cpp_Runner.showCompilationTime": false,
   "C_Cpp_Runner.useLinkTimeOptimization": false,
   "C_Cpp_Runner.msvcSecureNoWarnings": false,
-  "C_Cpp.default.cppStandard": "c++23"
+  "C_Cpp.default.cppStandard": "c++23",
+  "files.associations": {
+    ".fantomasignore": "ignore",
+    "vector": "cpp"
+  }
 }
