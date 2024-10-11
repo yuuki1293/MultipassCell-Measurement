@@ -11,6 +11,7 @@ using namespace std;
 using namespace traits;
 
 Mat projectiveT(Mat src);
+Mat binaryT(Mat src);
 Mat remove_area(const Mat image, int min, int max);
 Mat crop(const Mat image, int left, int top, int right, int bottom);
 string toSVG(const Point *centers, int n);
