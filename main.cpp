@@ -20,14 +20,15 @@ int main()
 {
     std::string image_path = "sample.JPG";
     Mat src = imread(image_path, IMREAD_COLOR);
-    Mat process, labelImg, stats, centroids, labeling;
+    Mat process, labelImg, stats, centroids, labelingBin, labeling;
 
     process = projectiveT(src);
-    Mat bin = process = binaryT(process);
+    process = binaryT(process);
     process = crop(process, 400, 400, 400, 400); // 縁から400pxを削除
     process = remove_area(process, 100, 3000); // 100~200ピクセル以外の図形を削除
 
-    bitwise_not(bin, labeling); // ラベリング用画像
+    bitwise_not(process, labelingBin); // ラベリング用画像
+    cvtColor(labelingBin, labeling, COLOR_GRAY2RGB);
     int n = connectedComponentsWithStats(process, labelImg, stats, centroids);
     Point centers[n];
     // 重心
