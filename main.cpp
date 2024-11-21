@@ -20,9 +20,13 @@ int main()
     cv::Mat process, labelImg, stats, centroids, labelingBin, labeling;
 
     process = projectiveT(src);
+    imwrite("projectiveT.png", process);
     process = binaryT(process);
+    imwrite("binaryT.png", process);
     process = crop(process, 400, 400, 400, 400); // 縁から400pxを削除
+    imwrite("crop.png", process);
     process = remove_area(process, 100, 3000);   // 100~200ピクセル以外の図形を削除
+    imwrite("remove_area.png", process);
 
     bitwise_not(process, labelingBin); // ラベリング用画像
     cvtColor(labelingBin, labeling, cv::COLOR_GRAY2RGB);
