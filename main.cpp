@@ -56,31 +56,6 @@ int main()
         diff[n - 1] = paramb[cv::CC_STAT_AREA] - parama[cv::CC_STAT_AREA];
     }
 
-    double max1 = -1, max2 = -1;
-    size_t max1_i, max2_i;
-    for (size_t i = 1; i < n; i++)
-    {
-        if (abs(diff[i]) >= max1)
-        {
-            max2_i = max1_i;
-            max1_i = i;
-            max2 = max1;
-            max1 = diff[i];
-        }
-        else if (abs(diff[i]) > max2)
-        {
-            max2_i = i;
-            max2 = diff[i];
-        }
-    }
-
-    std::print("max1 {} = {} max2 {} = {}\n", max1_i, max1, max2_i, max2);
-    if (diff[max1_i] > 0)
-    {
-        max1_i++;
-        max2_i++;
-    }
-
     cv::Point centers[n];
     // 重心
     for (size_t i = 1; i < n; i++)
@@ -90,12 +65,7 @@ int main()
         int y = param[1];
 
         centers[i] = cv::Point(x, y);
-        if (i == max1_i)
-            circle(labeling, cv::Point(x, y), 10, cv::Scalar(0, 255, 0), -1);
-        else if (i == max2_i)
-            circle(labeling, cv::Point(x, y), 10, cv::Scalar(0, 0, 255), -1);
-        else
-            circle(labeling, cv::Point(x, y), 10, cv::Scalar(255, 0, 0), -1);
+        circle(labeling, cv::Point(x, y), 10, cv::Scalar(255, 0, 0), -1);
     }
 
     // 面積値の出力
