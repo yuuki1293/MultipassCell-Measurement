@@ -11,7 +11,7 @@ cv::Mat binaryT(cv::Mat src);
 cv::Mat remove_area(const cv::Mat image, int min, int max);
 cv::Mat crop(const cv::Mat image, int left, int top, int right, int bottom);
 std::string toSVG(const cv::Point *centers, int n);
-std::vector<int> sort(int n, cv::Mat centroids, int offset_x, int offset_y);
+std::vector<int> sort(cv::Mat src, int n, cv::Mat labels);
 
 int main()
 {
@@ -25,13 +25,13 @@ int main()
     imwrite("binaryT.png", process);
     process = crop(process, 400, 400, 400, 400); // 縁から400pxを削除
     imwrite("crop.png", process);
-    process = remove_area(process, 100, 3000);   // 100~200ピクセル以外の図形を削除
+    process = remove_area(process, 100, 3000); // 100~200ピクセル以外の図形を削除
     imwrite("remove_area.png", process);
 
     bitwise_not(process, labelingBin); // ラベリング用画像
     cvtColor(labelingBin, labeling, cv::COLOR_GRAY2RGB);
     int n = connectedComponentsWithStats(process, labelImg, stats, centroids);
-    std::vector<int> sortmap = sort(n, centroids, -1000, -1000);
+    std::vector<int> sortmap = sort(src, n, labelImg);
 
     int *statsArray[n];
     double *centroidsArray[n];
@@ -221,25 +221,43 @@ std::string toSVG(const cv::Point *centers, int n)
     return s;
 }
 
-std::vector<int> sort(int n, cv::Mat centroids, int offset_x, int offset_y)
+// 反射順にソート
+std::vector<int> sort(cv::Mat src, int n, cv::Mat labels)
 {
+    // G値を取り出す
+    cv::Mat bgr_channels[3];
+    split(src, bgr_channels);
+
     // インデックスを保持するベクトルを作成
-    std::vector<int> indices(n);
+    std::vector<int> indices(n), concentrations(n);
     for (int i = 1; i < n; ++i)
     {
         indices[i] = i;
+        concentrations[i] = 0;
     }
 
+    // ラベルごとに濃度測定
+    for (int y = 0; y < labels.rows; y++)
+    {
+        for (int x = 0; x < labels.cols; x++)
+        {
+            int label = labels.at<int>(y, x);
+            uchar concentration = bgr_channels[1].at<uchar>(y, x);
+            concentrations[label] += concentration;
+        }
+    }
+
+#ifdef DEBUG
+    std::puts("concentrations");
+    for (size_t i = 1; i < n; i++)
+    {
+        std::print(" {} {}\n", i, concentrations[i]);
+    }
+#endif // DEBUG
+
     // 面積を基準にインデックスをソート
-    std::sort(indices.begin() + 1, indices.end(), [&centroids, offset_x, offset_y](int a, int b)
-              {
-        double ax = centroids.ptr<double>(a)[0] + offset_x;
-        double ay = centroids.ptr<double>(a)[1] + offset_y;
-        double bx = centroids.ptr<double>(b)[0] + offset_x;
-        double by = centroids.ptr<double>(b)[1] + offset_y;
-        double atheta = atan2(ay, ax);
-        double btheta = atan2(by, bx);
-        return atheta > btheta; });
+    std::sort(indices.begin() + 1, indices.end(), [concentrations](int a, int b)
+              { return concentrations[a] > concentrations[b]; });
 
     return indices;
 }
