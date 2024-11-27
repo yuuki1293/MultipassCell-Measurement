@@ -4,7 +4,7 @@
 #include <opencv2/opencv.hpp>
 
 #define REAL_LEN 88900 // μm
-#define THRESHOLD 180  // しきい値
+#define THRESHOLD 50  // しきい値
 
 cv::Mat projectiveT(cv::Mat src);
 cv::Mat binaryT(cv::Mat src);
@@ -12,15 +12,17 @@ cv::Mat remove_area(const cv::Mat image, int min, int max);
 cv::Mat crop(const cv::Mat image, int left, int top, int right, int bottom);
 std::string toSVG(const cv::Point *centers, int n);
 std::vector<int> sort(cv::Mat src, int n, cv::Mat labels);
+void checkSaturation(cv::Mat src);
 
 int main()
 {
-    std::string image_path = "sample.png";
+    std::string image_path = "sample.JPG";
     cv::Mat src = cv::imread(image_path, cv::IMREAD_COLOR);
     cv::Mat process, labelImg, stats, centroids, labelingBin, labeling;
 
     process = projectiveT(src);
     imwrite("projectiveT.png", process);
+    checkSaturation(process);
     process = binaryT(process);
     imwrite("binaryT.png", process);
     process = crop(process, 400, 400, 400, 400); // 縁から400pxを削除
@@ -110,10 +112,10 @@ int main()
 cv::Mat projectiveT(cv::Mat src)
 {
     std::vector<cv::Point2f> src_pts;
-    src_pts.push_back(cv::Point2f(1468, 528));  // ↖
-    src_pts.push_back(cv::Point2f(3322, 577));  // ↗
-    src_pts.push_back(cv::Point2f(1474, 2634)); // ↙
-    src_pts.push_back(cv::Point2f(3316, 2516)); // ↘
+    src_pts.push_back(cv::Point2f(1314, 578));  // ↖
+    src_pts.push_back(cv::Point2f(3270, 632));  // ↗
+    src_pts.push_back(cv::Point2f(1266, 2698)); // ↙
+    src_pts.push_back(cv::Point2f(3358, 2566)); // ↘
 
     std::vector<cv::Point2f> dst_pts;
     dst_pts.push_back(cv::Point2f(0, 0));       // ↖
@@ -230,4 +232,13 @@ std::vector<int> sort(cv::Mat src, int n, cv::Mat labels)
               { return concentrations[a] > concentrations[b]; });
 
     return indices;
+}
+
+void checkSaturation(cv::Mat src) {
+    cv::Mat bgr_channels[3], result;
+    split(src, bgr_channels);
+    cv:: Mat g_channel = bgr_channels[1];
+
+    inRange(g_channel, cv::Scalar(0), cv::Scalar(254), result);
+    imwrite("saturation.png", result);
 }
