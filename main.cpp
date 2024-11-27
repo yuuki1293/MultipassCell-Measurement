@@ -20,10 +20,10 @@ int main()
     cv::Mat src = cv::imread(image_path, cv::IMREAD_COLOR);
     cv::Mat process, labelImg, stats, centroids, labelingBin, labeling;
 
-    process = projectiveT(src);
-    imwrite("projectiveT.png", process);
-    checkSaturation(process);
-    process = binaryT(process);
+    cv::Mat projective = projectiveT(src);
+    imwrite("projectiveT.png", projective);
+    checkSaturation(projective);
+    process = binaryT(projective);
     imwrite("binaryT.png", process);
     process = crop(process, 400, 400, 400, 400); // 縁から400pxを削除
     imwrite("crop.png", process);
@@ -33,7 +33,7 @@ int main()
     bitwise_not(process, labelingBin); // ラベリング用画像
     cvtColor(labelingBin, labeling, cv::COLOR_GRAY2RGB);
     int n = connectedComponentsWithStats(process, labelImg, stats, centroids);
-    std::vector<int> sortmap = sort(src, n, labelImg);
+    std::vector<int> sortmap = sort(projective, n, labelImg);
 
     int *statsArray[n];
     double *centroidsArray[n];
@@ -216,6 +216,8 @@ std::vector<int> sort(cv::Mat src, int n, cv::Mat labels)
             int label = labels.at<int>(y, x);
             uchar concentration = bgr_channels[1].at<uchar>(y, x);
             concentrations[label] += concentration;
+            if(label != 0)
+                std::print("{}\n", concentration);
         }
     }
 
