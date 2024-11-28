@@ -112,10 +112,10 @@ int main()
 cv::Mat projectiveT(cv::Mat src)
 {
     std::vector<cv::Point2f> src_pts;
-    src_pts.push_back(cv::Point2f(1314, 578));  // ↖
-    src_pts.push_back(cv::Point2f(3270, 632));  // ↗
-    src_pts.push_back(cv::Point2f(1266, 2698)); // ↙
-    src_pts.push_back(cv::Point2f(3358, 2566)); // ↘
+    src_pts.push_back(cv::Point2f(1064, 394));  // ↖
+    src_pts.push_back(cv::Point2f(3425, 493));  // ↗
+    src_pts.push_back(cv::Point2f(1154, 3035)); // ↙
+    src_pts.push_back(cv::Point2f(3358, 2870)); // ↘
 
     std::vector<cv::Point2f> dst_pts;
     dst_pts.push_back(cv::Point2f(0, 0));       // ↖
