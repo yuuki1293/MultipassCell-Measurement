@@ -215,7 +215,7 @@ std::vector<int> sort(cv::Mat src, int n, cv::Mat labels)
         {
             int label = labels.at<int>(y, x);
             uchar concentration = bgr_channels[1].at<uchar>(y, x);
-            concentrations[label] += concentration * concentration;
+            concentrations[label] += concentration;
         }
     }
 
