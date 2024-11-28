@@ -97,10 +97,13 @@ int main()
     out << toSVG(centers, n);
     out.close();
 
+    std::ofstream outcsv("out.csv");
     for (size_t i = 1; i < n; i++)
     {
+        outcsv << std::format("{},{}\n", centers[i].x, centers[i].y);
         std::print("{} = ({}, {})\n", i, centers[i].x, centers[i].y);
     }
+    outcsv.close();
 
     imwrite("label.png", labeling);
     imshow("Display window", labeling);
@@ -199,6 +202,8 @@ std::vector<int> sort(cv::Mat src, int n, cv::Mat labels)
     // G値を取り出す
     cv::Mat bgr_channels[3];
     split(src, bgr_channels);
+
+    imwrite("g.png", bgr_channels[1]);
 
     // インデックスを保持するベクトルを作成
     std::vector<int> indices(n), concentrations(n);
